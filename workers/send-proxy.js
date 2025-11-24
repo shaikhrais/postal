@@ -64,7 +64,8 @@ export default {
     const relayUrl = env.RELAY_URL;
     const relayKey = env.RELAY_API_KEY;
 
-    if (!relayUrl) {
+    // If no relay URL or no relay API key is configured, simulate acceptance
+    if (!relayUrl || !relayKey) {
       return new Response(JSON.stringify({ ok: true, message: 'accepted (simulated)', payload }), { status: 202 });
     }
 
