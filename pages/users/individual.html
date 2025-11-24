@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Individual Users — Postal PoC</title>
+    <style>body{font-family:system-ui,Segoe UI,Arial;margin:28px;line-height:1.45}code{background:#f6f8fa;padding:2px 6px;border-radius:4px}</style>
+  </head>
+  <body>
+    <h1>Individual / Developer Users — How to use Postal</h1>
+    <p>Developers and individual users want a simple, fast way to integrate email sending for apps, tests, or small projects.</p>
+
+    <h2>Quick Start</h2>
+    <ol>
+      <li>Get an API key from the dashboard (PoC: use <code>x-api-key</code> header for testing).</li>
+      <li>Send a test message to verify integration:</li>
+    </ol>
+    <pre>
+curl -X POST https://your-pages-url/api/send \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: test" \
+  -d '{"from":"me@example.com","to":"you@example.com","subject":"hi","text":"hello"}'
+    </pre>
+
+    <h2>Developer Tips</h2>
+    <ul>
+      <li>Use SDK snippets (Node/Python) to integrate quickly.</li>
+      <li>For local testing use <code>wrangler dev</code> and the local endpoints.</li>
+      <li>Use the domain wizard for sending from your own domain.</li>
+    </ul>
+
+    <h2>SDK Examples</h2>
+    <p>Replace <code>YOUR_API_KEY</code> and <code>https://your-pages-url</code> with your values.</p>
+
+    <h3>Node.js (native fetch)</h3>
+    <pre>
+// Node 18+ (or any runtime with fetch)
+const payload = {
+  from: 'me@example.com',
+  to: 'you@example.com',
+  subject: 'Hello from Node',
+  text: 'Hi — this is a test.'
+};
+
+const res = await fetch('https://your-pages-url/api/send', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'YOUR_API_KEY'
+  },
+  body: JSON.stringify(payload)
+});
+const data = await res.json();
+console.log(res.status, data);
+    </pre>
+
+    <h3>Python (requests)</h3>
+    <pre>
+import requests
+
+url = 'https://your-pages-url/api/send'
+headers = {
+    'Content-Type': 'application/json',
+    'x-api-key': 'YOUR_API_KEY'
+}
+payload = {
+    'from': 'me@example.com',
+    'to': 'you@example.com',
+    'subject': 'Hello from Python',
+    'text': 'Hi — this is a test.'
+}
+
+resp = requests.post(url, headers=headers, json=payload)
+try:
+    print(resp.status_code, resp.json())
+except ValueError:
+    print(resp.status_code, resp.text)
+    </pre>
+
+    <h2>When to upgrade</h2>
+    <p>Upgrade to paid tiers when you need higher throughput, dedicated IPs, or advanced analytics.</p>
+
+    <p><a href="/how-to-use.html">How to use</a> · <a href="/">Home</a></p>
+  </body>
+</html>

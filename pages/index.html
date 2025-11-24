@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Postal Cloudflare PoC</title>
+    <style>body{font-family:system-ui,Segoe UI,Arial;margin:48px}a{color:#0366d6}</style>
+  </head>
+  <body>
+    <h1>Postal — Cloudflare PoC</h1>
+    <p>This demo includes a minimal Pages site and sample Workers for sending and domain checks.</p>
+    <ul>
+      <li><a href="/domain-wizard.html">Domain setup wizard (demo)</a></li>
+      <li><a href="/how-to-use.html">How to use this system</a></li>
+      <li>User guides:
+        <ul>
+          <li><a href="/users/b2b.html">B2B (enterprises & SaaS)</a></li>
+          <li><a href="/users/b2c.html">B2C (marketplaces & merchants)</a></li>
+          <li><a href="/users/individual.html">Individual / Developers</a></li>
+        </ul>
+      </li>
+      <li>Workers endpoints:
+        <ul>
+          <li><code>/api/send</code> — send-proxy (POST)</li>
+          <li><code>/api/check-domain?domain=example.com</code> — DNS checks</li>
+          <li><code>/api/tracking-pixel?mid=...</code> — tracking pixel</li>
+        </ul>
+      </li>
+    </ul>
+    <p>See <a href="/docs/phase-0-poc.md">PoC docs</a> for setup and deploy instructions.</p>
+  </body>
+</html>

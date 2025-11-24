@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>How to Use — Postal PoC</title>
+    <style>body{font-family:system-ui,Segoe UI,Arial;margin:28px;line-height:1.5}pre{background:#f6f8fa;padding:12px;border-radius:6px}</style>
+  </head>
+  <body>
+    <h1>How to Use this Postal PoC</h1>
+    <p>This page explains the minimal workflow for using the Cloudflare-native Postal proof-of-concept. It covers onboarding, sending messages, domain setup, tracking, and monitoring.</p>
+
+    <h2>1. Onboarding & API keys</h2>
+    <p>Create an organization and generate an API key (PoC: use the demo key header <code>x-api-key</code>). In production, API keys are stored in a control-plane database (D1) and can be rotated or revoked.</p>
+
+    <h2>2. Domain setup</h2>
+    <p>Use the <a href="/domain-wizard.html">Domain setup wizard</a> to validate SPF, DKIM, and DMARC records. Add DNS TXT records provided by the wizard to complete verification.</p>
+
+    <h2>3. Sending messages</h2>
+    <p>Send messages to the edge intake endpoint. PoC endpoints:</p>
+    <pre>
+POST /api/send
+Headers: x-api-key: &lt;key&gt;
+Body: { "from": "me@example.com", "to": "you@example.com", "subject": "Hi", "text": "Hello" }
+    </pre>
+    <h3>Example: cURL</h3>
+    <p>Replace <code>YOUR_API_KEY</code> and <code>https://your-pages-url</code> with your values.</p>
+    <pre>
+curl -X POST "https://your-pages-url/api/send" \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -d '{"from":"me@example.com","to":"you@example.com","subject":"Hello","text":"Hello from Postal PoC"}'
+    </pre>
+    <p>The PoC will forward to an HTTP relay if configured (environment variable <code>RELAY_URL</code>), otherwise it simulates acceptance.</p>
+
+    <h2>4. Tracking & events</h2>
+    <p>Track opens and clicks using the tracking endpoints:</p>
+    <pre>
+GET /api/tracking-pixel?mid=&lt;message_id&gt;
+GET /api/tracking-redirect?url=&lt;encoded_url&gt;&mid=&lt;message_id&gt;
+    </pre>
+    <p>Events are enqueued for ingestion and processing in the events pipeline in production.</p>
+
+    <h2>5. Observability</h2>
+    <p>Use Logs and Metrics (Logpush + external analytics) to monitor queue lag, delivery rates, and bounce spikes. For PoC review logs in the Cloudflare Workers dashboard or local <code>wrangler dev</code> output.</p>
+
+    <h2>6. Next steps</h2>
+    <ul>
+      <li>Protect API keys with D1 and add Durable Object rate-limiters.</li>
+      <li>Decide on delivery strategy (SMTP API vs self-hosted MTA).</li>
+      <li>Set up Queues and Router for production routing and throttling.</li>
+    </ul>
+
+    <p><a href="/">Back to Home</a></p>
+  </body>
+</html>

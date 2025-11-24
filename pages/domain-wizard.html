@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Domain Setup Wizard — PoC</title>
+    <style>body{font-family:system-ui,Segoe UI,Arial;margin:24px}</style>
+  </head>
+  <body>
+    <h1>Domain Setup Wizard (Demo)</h1>
+    <p>Enter a domain to run basic DNS checks (SPF/DKIM/DMARC).</p>
+    <form id="f">
+      <input id="domain" placeholder="example.com" />
+      <button type="submit">Check</button>
+    </form>
+    <pre id="out"></pre>
+    <script>
+    document.getElementById('f').addEventListener('submit', async e=>{
+      e.preventDefault();
+      const d = document.getElementById('domain').value;
+      const res = await fetch(`/api/check-domain?domain=${encodeURIComponent(d)}`);
+      const json = await res.json();
+      document.getElementById('out').textContent = JSON.stringify(json, null, 2);
+    })
+    </script>
+  </body>
+</html>
