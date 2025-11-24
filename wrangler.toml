@@ -1,0 +1,14 @@
+name = "postal-poc"
+main = "index.js"
+type = "javascript"
+
+account_id = "<YOUR_CLOUDFLARE_ACCOUNT_ID>"
+
+compatibility_date = "2025-11-24"
+
+[vars]
+RELAY_URL = "https://api.sendgrid.com/v3/mail/send"
+#RELAY_API_KEY should be set with `wrangler secret put RELAY_API_KEY`
+
+[site]
+bucket = "pages"

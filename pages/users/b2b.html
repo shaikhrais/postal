@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>B2B Users — Postal PoC</title>
+    <style>body{font-family:system-ui,Segoe UI,Arial;margin:28px;line-height:1.45}code{background:#f6f8fa;padding:2px 6px;border-radius:4px}</style>
+  </head>
+  <body>
+    <h1>B2B (Enterprises & SaaS) — How to use Postal</h1>
+    <p>B2B customers typically need multi-tenant isolation, dedicated IPs, SLA, and advanced deliverability controls. This section lists recommended steps and features for enterprise usage.</p>
+
+    <h2>Key Requirements</h2>
+    <ul>
+      <li>Dedicated IP allocation and IP warmup scheduling.</li>
+      <li>Multi-org tenancy and role-based access control.</li>
+      <li>Per-organization rate limits, quotas, and invoice billing.</li>
+      <li>Detailed delivery analytics and domain-level reputation graphs.</li>
+    </ul>
+
+    <h2>Recommended Onboarding Flow</h2>
+    <ol>
+      <li>Sign up and create an organization.</li>
+      <li>Configure billing (Stripe) and purchase dedicated IP(s) if required.</li>
+      <li>Add sending domains via the domain wizard and complete DKIM/SPF/DMARC checks.</li>
+      <li>Create and distribute API keys to application teams (rotate regularly).</li>
+      <li>Start sending through the edge intake; monitor warmup and reputation via dashboards.</li>
+    </ol>
+
+    <h2>Operations & Deliverability</h2>
+    <p>B2B customers should use a hybrid delivery model: start on HTTP relay APIs for non-critical traffic, and migrate high-volume streams to dedicated MTA instances with dedicated IPs for the best control over reputation.</p>
+
+    <h2>Security & Compliance</h2>
+    <p>Enable Cloudflare Access for admin UI, require 2FA, and add automated abuse detection to pause suspicious activity.</p>
+
+    <p><a href="/how-to-use.html">How to use</a> · <a href="/">Home</a></p>
+  </body>
+</html>
