@@ -3,11 +3,12 @@
 This runbook documents the minimal steps and required secrets to deploy the PoC to Cloudflare using GitHub Actions or `wrangler publish`.
 
 ## Required secrets (GitHub repository)
-- `CLOUDFLARE_API_TOKEN` — a token with permissions to publish Workers and Pages.
-- `CLOUDFLARE_ACCOUNT_ID` — your Cloudflare account id (used by wrangler if not present in `wrangler.toml`).
-- `RELAY_API_KEY` — API key for the HTTP relay service (optional for production relay).
-- `DEMO_API_KEYS` — comma-separated demo keys for testing (e.g. `test,dev`).
 
+## Additional runtime bindings for Phase 1
+- `API_KEYS_DB` (D1): bind a D1 database named `postal_api_keys` as the `API_KEYS_DB` binding in `wrangler.toml`.
+- `RATE_LIMIT_DO` (Durable Object): register a Durable Object class `RateLimiter` and bind it as `RATE_LIMIT_DO` in `wrangler.toml`.
+
+The PoC will validate API keys against the D1 `api_keys` table if the D1 binding exists; otherwise it will use `DEMO_API_KEYS` for quick testing. A Durable Object is used to enforce a per-key rate limit by default.
 ## GitHub Actions
 A workflow exists at `.github/workflows/deploy.yml`. It runs `wrangler publish` and requires `CLOUDFLARE_API_TOKEN` to be set in repository secrets.
 

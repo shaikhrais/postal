@@ -12,3 +12,12 @@ RELAY_URL = "https://api.sendgrid.com/v3/mail/send"
 
 [site]
 bucket = "pages"
+
+[[d1_databases]]
+binding = "API_KEYS_DB"
+database_name = "postal_api_keys"
+
+[durable_objects]
+bindings = [
+	{ name = "RATE_LIMIT_DO", class_name = "RateLimiter" }
+]

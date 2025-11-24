@@ -16,14 +16,43 @@ export default {
       }
     }
 
-    // Optional: If you bind a D1 database to the Worker (binding name `API_KEYS_DB`),
-    // you can validate like this (uncomment and adapt when D1 is configured):
-    // try {
-    //   const row = await env.API_KEYS_DB.prepare('SELECT id FROM api_keys WHERE key = ?').bind(apiKey).first();
-    //   if (!row) return new Response(JSON.stringify({ error: 'invalid api key' }), { status: 403 });
-    // } catch (e) {
-    //   // fall back or fail-open depending on your policy
-    // }
+    // If a D1 database is bound (binding name `API_KEYS_DB`), validate against it.
+    let validated = false;
+    if (env.API_KEYS_DB) {
+      try {
+        const row = await env.API_KEYS_DB.prepare('SELECT id FROM api_keys WHERE key = ? LIMIT 1').bind(apiKey).first();
+        if (row) validated = true;
+      } catch (e) {
+        // If D1 fails, we will fall back to demo keys for now.
+        console.warn('D1 lookup failed', e);
+      }
+    }
+
+    if (!validated && demoKeys.length > 0) {
+      if (!demoKeys.includes(apiKey)) {
+        return new Response(JSON.stringify({ error: 'invalid api key' }), { status: 403 });
+      }
+      validated = true;
+    }
+
+    if (!validated && !env.API_KEYS_DB) {
+      // No D1 bound and no demo keys configured — treat as unauthorized.
+      return new Response(JSON.stringify({ error: 'invalid api key' }), { status: 403 });
+    }
+
+    // Rate limiting via Durable Object
+    if (env.RATE_LIMIT_DO) {
+      try {
+        const stub = env.RATE_LIMIT_DO.get(apiKey);
+        const rlRes = await stub.fetch(new Request('https://rate-limiter/', { method: 'POST' }));
+        if (rlRes.status === 429) {
+          return rlRes;
+        }
+      } catch (e) {
+        console.warn('Rate limiter DO call failed', e);
+        // If the rate limiter fails, continue (fail-open) or decide to fail-closed.
+      }
+    }
 
     let payload;
     try {
