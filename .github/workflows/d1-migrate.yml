@@ -1,0 +1,63 @@
+# CI: Run D1 migration and seed
+# Triggers: manual (workflow_dispatch) and after the 'Deploy to Cloudflare' workflow completes successfully.
+# Required repository secrets:
+# - CLOUDFLARE_API_TOKEN
+# - CLOUDFLARE_ACCOUNT_ID
+# - D1_DB_NAME (e.g. postal_api_keys)
+
+name: D1 Migration & Seed
+
+on:
+  workflow_dispatch: {}
+  workflow_run:
+    workflows: ["Deploy to Cloudflare"]
+    types:
+      - completed
+
+jobs:
+  run-migration:
+    # Only run automatically when the deploy workflow completed successfully
+    if: |
+      github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install wrangler
+        run: npm install -g wrangler@latest
+
+      - name: Show files (debug)
+        run: ls -la
+
+      - name: Run D1 migration (create table + seed)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          D1_DB_NAME: ${{ secrets.D1_DB_NAME }}
+        run: |
+          if [ -z "$D1_DB_NAME" ]; then
+            echo "Missing secret D1_DB_NAME (set to your D1 database name, e.g. postal_api_keys)" >&2
+            exit 1
+          fi
+          echo "Applying migration file: d1/migrations/001_init.sql to D1 DB $D1_DB_NAME"
+          sql=$(cat d1/migrations/001_init.sql)
+          echo "--- SQL ---"
+          echo "$sql"
+          echo "--- executing ---"
+          wrangler d1 execute "$D1_DB_NAME" --remote --command "$sql"
+
+      - name: Verify seeded keys
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          D1_DB_NAME: ${{ secrets.D1_DB_NAME }}
+        run: |
+          echo "Verifying contents of api_keys"
+          wrangler d1 execute "$D1_DB_NAME" --remote --command "SELECT id, owner, key, created_at FROM api_keys;"

@@ -54,6 +54,22 @@ export default {
       }
     }
 
+    // Testing helper: if caller sets header `x-simulate: 1`, short-circuit and
+    // return a simulated acceptance response (useful when a relay is configured
+    // but you want to test the PoC flow without valid relay credentials).
+    const simulateHeader = request.headers.get('x-simulate') || request.headers.get('simulate');
+    const url = new URL(request.url);
+    const simulateQuery = url.searchParams.get('simulate');
+
+    if (simulateHeader === '1' || simulateQuery === '1') {
+      try {
+        const maybePayload = await request.json().catch(() => null);
+        return new Response(JSON.stringify({ ok: true, message: 'accepted (simulated via header)', payload: maybePayload }), { status: 202 });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: true, message: 'accepted (simulated)' }), { status: 202 });
+      }
+    }
+
     let payload;
     try {
       payload = await request.json();

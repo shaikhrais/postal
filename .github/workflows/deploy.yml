@@ -33,3 +33,16 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           RELAY_API_KEY: ${{ secrets.RELAY_API_KEY }}
+
+      - name: Dispatch D1 migration workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const workflow_id = 'd1-migrate.yml';
+            const ref = github.context.ref.replace('refs/heads/', '') || github.context.sha;
+            core.info(`Dispatching workflow ${workflow_id} on ref ${ref}`);
+            await github.rest.actions.createWorkflowDispatch({ owner, repo, workflow_id, ref });
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

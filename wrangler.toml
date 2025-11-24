@@ -2,7 +2,7 @@ name = "postal-poc"
 main = "index.js"
 type = "javascript"
 
-account_id = "<YOUR_CLOUDFLARE_ACCOUNT_ID>"
+account_id = "7c217d59deb12dff98012cc86eb2164d"
 
 compatibility_date = "2025-11-24"
 
@@ -21,3 +21,7 @@ database_name = "postal_api_keys"
 bindings = [
 	{ name = "RATE_LIMIT_DO", class_name = "RateLimiter" }
 ]
+
+[[migrations]]
+tag = "v1"
+new_classes = [ "RateLimiter" ]
