@@ -21,10 +21,11 @@ jobs:
         run: npm install -g wrangler
 
       - name: Check required secrets
-        if: ${{ !secrets.CLOUDFLARE_API_TOKEN || !secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          echo "Missing CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID. Set repository secrets to publish."
-          exit 1
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ] || [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            echo "Missing CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID. Set repository secrets to publish."
+            exit 1
+          fi
 
       - name: Publish to Cloudflare
         run: |
