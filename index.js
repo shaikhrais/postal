@@ -18,6 +18,10 @@ export default {
         await env.API_KEYS_DB.prepare('INSERT INTO api_keys (owner, key) VALUES (?, ?)').bind('demo', 'test').run();
         return new Response(JSON.stringify({ ok: true, inserted: 'test' }), { status: 200, headers: { 'content-type': 'application/json' } });
       }
+      if (path.startsWith('/admin/has-relay')) {
+        const has = !!env.RELAY_API_KEY;
+        return new Response(JSON.stringify({ hasRelayKey: has }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
       if (path.startsWith('/api/send')) return sendProxy.fetch(request, env, ctx);
       if (path.startsWith('/api/check-domain')) return checkDomain.fetch(request, env, ctx);
       if (path.startsWith('/api/tracking-pixel')) return trackingPixel.fetch(request, env, ctx);
