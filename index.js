@@ -1,6 +1,7 @@
 import sendProxy from '../workers/send-proxy.js';
 import checkDomain from '../workers/check-domain.js';
 import trackingPixel from '../workers/tracking-pixel.js';
+import { RateLimiter } from './workers/rate_limiter.js';
 
 export default {
   async fetch(request, env, ctx) {
@@ -8,6 +9,15 @@ export default {
     const path = url.pathname || '/';
 
     try {
+      // Admin seed endpoint for demo: POST /admin/seed-demo?secret=<secret>
+      if (path.startsWith('/admin/seed-demo')) {
+        const secret = url.searchParams.get('secret') || '';
+        // simple guard: require secret=seed-now (temporary for demo)
+        if (secret !== 'seed-now') return new Response('Forbidden', { status: 403 });
+        if (!env.API_KEYS_DB) return new Response(JSON.stringify({ error: 'no d1 binding' }), { status: 500 });
+        await env.API_KEYS_DB.prepare('INSERT INTO api_keys (owner, key) VALUES (?, ?)').bind('demo', 'test').run();
+        return new Response(JSON.stringify({ ok: true, inserted: 'test' }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
       if (path.startsWith('/api/send')) return sendProxy.fetch(request, env, ctx);
       if (path.startsWith('/api/check-domain')) return checkDomain.fetch(request, env, ctx);
       if (path.startsWith('/api/tracking-pixel')) return trackingPixel.fetch(request, env, ctx);
@@ -22,3 +32,5 @@ export default {
     }
   }
 };
+
+export { RateLimiter };
