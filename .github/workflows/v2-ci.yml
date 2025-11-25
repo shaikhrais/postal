@@ -1,0 +1,44 @@
+name: V2 Build & Test
+
+on:
+  push:
+    branches: [ v2-migration ]
+  workflow_dispatch:
+
+concurrency:
+  group: v2-ci
+  cancel-in-progress: true
+
+jobs:
+  build-backend:
+    name: Build backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install backend deps
+        working-directory: v2/backend
+        run: npm ci
+      - name: Build backend
+        working-directory: v2/backend
+        run: npm run build
+
+  build-frontend:
+    name: Build frontend
+    runs-on: ubuntu-latest
+    needs: build-backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install frontend deps
+        working-directory: v2/frontend
+        run: npm ci
+      - name: Build frontend
+        working-directory: v2/frontend
+        run: npm run build
